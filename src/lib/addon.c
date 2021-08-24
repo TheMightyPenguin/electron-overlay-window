@@ -200,6 +200,12 @@ void AddonCleanUp(void* arg) {
   // UnhookWinEvent(win_event_hhook);
 }
 
+napi_value AddonStop(napi_env env, napi_callback_info info)
+{
+  ow_stop();
+  return NULL;
+}
+
 NAPI_MODULE_INIT() {
   napi_status status;
   napi_value export_fn;
@@ -207,6 +213,11 @@ NAPI_MODULE_INIT() {
   status = napi_create_function(env, NULL, 0, AddonStart, NULL, &export_fn);
   NAPI_FATAL_IF_FAILED(status, "NAPI_MODULE_INIT", "napi_create_function");
   status = napi_set_named_property(env, exports, "start", export_fn);
+  NAPI_FATAL_IF_FAILED(status, "NAPI_MODULE_INIT", "napi_set_named_property");
+
+  status = napi_create_function(env, NULL, 0, AddonStop, NULL, &export_fn);
+  NAPI_FATAL_IF_FAILED(status, "NAPI_MODULE_INIT", "napi_create_function");
+  status = napi_set_named_property(env, exports, "stop", export_fn);
   NAPI_FATAL_IF_FAILED(status, "NAPI_MODULE_INIT", "napi_set_named_property");
 
   status = napi_create_function(env, NULL, 0, AddonActivateOverlay, NULL, &export_fn);

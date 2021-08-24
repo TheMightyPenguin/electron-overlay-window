@@ -1,6 +1,6 @@
 # electron-overlay-window
 
-[![](https://img.shields.io/npm/v/electron-overlay-window/latest?color=CC3534&label=electron-overlay-window&logo=npm&labelColor=212121)](https://www.npmjs.com/package/electron-overlay-window)
+[![](https://img.shields.io/npm/v/@themightypenguin/electron-overlay-window/latest?color=CC3534&label=electron-overlay-window&logo=npm&labelColor=212121)](https://www.npmjs.com/package/@themightypenguin/electron-overlay-window)
 
 Library for creating overlay windows, intended to complement Electron.
 
@@ -27,3 +27,7 @@ Supported backends:
 Recommended dev utils
 - Windows: AccEvent (accevent.exe) and Inspect Object (inspect.exe) from Windows SDK
 - X11: xwininfo, xprop, xev
+
+## Publishing
+
+Run `yarn build` then `yarn prebuild`, then `npm publish`

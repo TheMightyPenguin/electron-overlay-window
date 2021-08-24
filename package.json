@@ -1,12 +1,12 @@
 {
-  "name": "electron-overlay-window",
-  "version": "2.0.1",
+  "name": "@themightypenguin/electron-overlay-window",
+  "version": "2.0.3",
   "author": {
-    "name": "Alexander Drozdov"
+    "name": "Victor Tortolero"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/SnosMe/electron-overlay-window.git"
+    "url": "https://github.com/TheMightyPenguin/electron-overlay-window.git"
   },
   "license": "MIT",
   "keywords": [
@@ -21,6 +21,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "install": "node-gyp-build",
+    "build": "node-gyp rebuild && yarn build-ts",
     "prebuild": "prebuildify --napi",
     "build-ts": "tsc",
     "demo:electron": "node-gyp build && yarn build-ts && electron dist/demo/electron-demo.js"
@@ -34,9 +35,9 @@
     "prebuilds"
   ],
   "devDependencies": {
-    "@types/node": "12.x.x",
+    "@types/node": "16.x.x",
     "@types/throttle-debounce": "2.x.x",
-    "electron": "10.x.x",
+    "electron": "12.0.5",
     "prebuildify": "4.x.x",
     "ts-node": "9.x.x",
     "typescript": "4.x.x"

@@ -330,13 +330,16 @@ static VOID CALLBACK foreground_timer_proc(HWND _hwnd, UINT msg, UINT_PTR timerI
   }
 }
 
+static bool stopped = false;
+
 static void hook_thread(void* _arg) {
-  SetWinEventHook(
-    EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND,
-    NULL, hook_proc, 0, 0, WINEVENT_OUTOFCONTEXT);
-  SetWinEventHook(
-    EVENT_SYSTEM_MINIMIZEEND, EVENT_SYSTEM_MINIMIZEEND,
-    NULL, hook_proc, 0, 0, WINEVENT_OUTOFCONTEXT);
+  stopped = false;
+  HWINEVENTHOOK testHook1 = SetWinEventHook(
+      EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND,
+      NULL, hook_proc, 0, 0, WINEVENT_OUTOFCONTEXT);
+  HWINEVENTHOOK testHook2 = SetWinEventHook(
+      EVENT_SYSTEM_MINIMIZEEND, EVENT_SYSTEM_MINIMIZEEND,
+      NULL, hook_proc, 0, 0, WINEVENT_OUTOFCONTEXT);
   // fix: ForegroundLockTimeout (even when = 0); Also edge cases when apps stealing FG window.
   //      Using timer because WH_SHELL & WH_CBT hooks require dll injection
   SetTimer(NULL, 0, OW_FOREGROUND_TIMER_MS, foreground_timer_proc);
@@ -351,10 +354,27 @@ static void hook_thread(void* _arg) {
   }
 
   MSG message;
-  while (GetMessageW(&message, (HWND)NULL, 0, 0) != FALSE) {
+  while (GetMessageW(&message, (HWND)NULL, 0, 0) != FALSE && !stopped) {
     TranslateMessage(&message);
     DispatchMessageW(&message);
   }
+
+  UnhookWinEvent(testHook1);
+  UnhookWinEvent(testHook2);
+  if (fg_window_namechange_hook != NULL) {
+    UnhookWinEvent(fg_window_namechange_hook);
+  }
+  KillTimer(NULL, 0);
+}
+
+void ow_stop() {
+  if (target_info.hwnd != NULL) {
+    UnhookWinEvent(target_info.location_hook);
+    UnhookWinEvent(target_info.destroy_hook);
+    target_info.hwnd = NULL;
+  }
+
+  stopped = true;
 }
 
 void ow_start_hook(char* target_window_title, void* overlay_window_id) {

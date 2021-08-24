@@ -55,6 +55,8 @@ struct ow_event {
 
 static uv_thread_t hook_tid;
 
+void ow_stop();
+
 void ow_start_hook(char* target_window_title, void* overlay_window_id);
 
 void ow_activate_overlay();

@@ -12,6 +12,7 @@ interface AddonExports {
     cb: (e: any) => void
   ): void
 
+  stop(): void
   activateOverlay(): void
   focusTarget(): void
 }
@@ -55,7 +56,7 @@ declare interface OverlayWindow {
 }
 
 class OverlayWindow extends EventEmitter {
-  private _overlayWindow!: BrowserWindow
+  private _overlayWindow?: BrowserWindow
   public defaultBehavior = true
   private lastBounds: Rectangle = { x: 0, y: 0, width: 0, height: 0 }
 
@@ -75,9 +76,9 @@ class OverlayWindow extends EventEmitter {
     this.on('attach', (e) => {
       if (this.defaultBehavior) {
         // linux: important to show window first before changing fullscreen
-        this._overlayWindow.showInactive()
+        this._overlayWindow!.showInactive()
         if (e.isFullscreen !== undefined) {
-          this._overlayWindow.setFullScreen(e.isFullscreen)
+          this._overlayWindow!.setFullScreen(e.isFullscreen)
         }
         this.lastBounds = e
         this.updateOverlayBounds()
@@ -86,13 +87,13 @@ class OverlayWindow extends EventEmitter {
 
     this.on('fullscreen', (e) => {
       if (this.defaultBehavior) {
-        this._overlayWindow.setFullScreen(e.isFullscreen)
+        this._overlayWindow!.setFullScreen(e.isFullscreen)
       }
     })
 
     this.on('detach', () => {
       if (this.defaultBehavior) {
-        this._overlayWindow.hide()
+        this._overlayWindow!.hide()
       }
     })
 
@@ -108,14 +109,14 @@ class OverlayWindow extends EventEmitter {
     let lastBounds = this.lastBounds
     if (lastBounds.width != 0 && lastBounds.height != 0) {
       if (process.platform === 'win32') {
-        lastBounds = screen.screenToDipRect(this._overlayWindow, this.lastBounds)
+        lastBounds = screen.screenToDipRect(this._overlayWindow!, this.lastBounds)
       }
-      this._overlayWindow.setBounds(lastBounds)
+      this._overlayWindow!.setBounds(lastBounds)
       if (process.platform === 'win32') {
         // if moved to screen with different DPI, 2nd call to setBounds will correctly resize window
         // dipRect must be recalculated as well
-        lastBounds = screen.screenToDipRect(this._overlayWindow, this.lastBounds)
-        this._overlayWindow.setBounds(lastBounds)
+        lastBounds = screen.screenToDipRect(this._overlayWindow!, this.lastBounds)
+        this._overlayWindow!.setBounds(lastBounds)
       }
     }
   }
@@ -150,12 +151,17 @@ class OverlayWindow extends EventEmitter {
       //         - also crashes if using .moveTop()
       lib.activateOverlay()
     } else {
-      this._overlayWindow.focus()
+      this._overlayWindow?.focus()
     }
   }
 
   focusTarget() {
     lib.focusTarget()
+  }
+
+  stop() {
+    lib.stop();
+    this._overlayWindow = undefined;
   }
 
   attachTo (overlayWindow: BrowserWindow, targetWindowTitle: string) {
