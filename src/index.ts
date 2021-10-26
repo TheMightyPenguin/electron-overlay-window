@@ -74,11 +74,11 @@ class OverlayWindow extends EventEmitter {
     super()
 
     this.on('attach', (e) => {
-      if (this.defaultBehavior) {
+      if (this.defaultBehavior && this._overlayWindow) {
         // linux: important to show window first before changing fullscreen
-        this._overlayWindow!.showInactive()
+        this._overlayWindow.showInactive()
         if (e.isFullscreen !== undefined) {
-          this._overlayWindow!.setFullScreen(e.isFullscreen)
+          this._overlayWindow.setFullScreen(e.isFullscreen)
         }
         this.lastBounds = e
         this.updateOverlayBounds()
@@ -86,14 +86,14 @@ class OverlayWindow extends EventEmitter {
     })
 
     this.on('fullscreen', (e) => {
-      if (this.defaultBehavior) {
-        this._overlayWindow!.setFullScreen(e.isFullscreen)
+      if (this.defaultBehavior && this._overlayWindow) {
+        this._overlayWindow.setFullScreen(e.isFullscreen)
       }
     })
 
     this.on('detach', () => {
-      if (this.defaultBehavior) {
-        this._overlayWindow!.hide()
+      if (this.defaultBehavior && this._overlayWindow) {
+        this._overlayWindow.hide()
       }
     })
 
@@ -106,6 +106,7 @@ class OverlayWindow extends EventEmitter {
   }
 
   private updateOverlayBounds () {
+    if (!this._overlayWindow) return
     let lastBounds = this.lastBounds
     if (lastBounds.width != 0 && lastBounds.height != 0) {
       if (process.platform === 'win32') {
